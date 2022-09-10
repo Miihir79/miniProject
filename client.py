@@ -4,7 +4,7 @@ import threading
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(('127.0.0.1', 12129))
 
-idName = input("Choose a name")
+idName = input("Choose a name: ")
 
 
 def recieveMessage():
@@ -28,10 +28,8 @@ def sendMessage():
         client.send(message.encode('ascii'))
 
 
-recieveThread = threading.Thread(target=recieveMessage())
+recieveThread = threading.Thread(target=recieveMessage)
 recieveThread.start()
 
-sendThread = threading.Thread(target=sendMessage())
+sendThread = threading.Thread(target=sendMessage)
 sendThread.start()
-
-sendMessage()
