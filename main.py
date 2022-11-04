@@ -49,5 +49,8 @@ def recieveMessage():
         thread = threading.Thread(target=handleClient, args=(client,))
         thread.start()
 
+        print(f"Active Connections: {threading.activeCount() - 1}")
 
+
+print("The Server is listening.")
 recieveMessage()
