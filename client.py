@@ -1,6 +1,10 @@
 import socket
 import threading
 from tkinter import Tk, Frame, Scrollbar, Label, END, Entry, Text, VERTICAL, Button, messagebox
+import asyncio
+# from credentials import userID, userPWD
+
+from nio import AsyncClient, MatrixRoom, RoomMessageText
 
 
 class GUI:
@@ -122,9 +126,93 @@ class GUI:
             exit(0)
 
 
-# the mail function
+class MatrixGUI:
+    def __init__(self, master):
+        self.client = AsyncClient("https://matrix.org", "@mihirs:matrix.org")
+        self.root = master
+        self.chat_transcript_area = None
+        self.name_widget = None
+        self.enter_text_widget = None
+        self.join_button = None
+        asyncio.run(self.initialize_matrix())
+        self.initialize_gui()
+
+    async def message_callback(self, room: MatrixRoom, event: RoomMessageText) -> None:
+        self.chat_transcript_area.insert('end', f"{room.user_name(event.sender)} | {event.body}" + '\n')
+        self.chat_transcript_area.yview(END)
+
+    async def initialize_matrix(self):
+        print(await self.client.login("QX6pJsNh.v.7GU!"))
+        self.client.add_event_callback(self.message_callback, RoomMessageText)
+
+    def initialize_gui(self):
+        self.root.title("Matrix Secured Chat")
+        self.root.resizable(0, 0)
+        self.display_chat_box()
+        self.display_name_section()
+        self.display_chat_entry_box()
+
+    def display_chat_box(self):
+        frame = Frame()
+        Label(frame, text='Chat Box:', font=("Serif", 12)).pack(side='top', anchor='w')
+        self.chat_transcript_area = Text(frame, width=60, height=10, font=("Serif", 12))
+        scrollbar = Scrollbar(frame, command=self.chat_transcript_area.yview, orient=VERTICAL)
+        self.chat_transcript_area.config(yscrollcommand=scrollbar.set)
+        self.chat_transcript_area.bind('<KeyPress>', lambda e: 'break')
+        self.chat_transcript_area.pack(side='left', padx=10)
+        scrollbar.pack(side='right', fill='y')
+        frame.pack(side='top')
+
+    def display_name_section(self):
+        frame = Frame()
+        Label(frame, text='Enter your name:', font=("Helvetica", 16)).pack(side='left', padx=10)
+        self.name_widget = Entry(frame, width=50, borderwidth=2)
+        self.name_widget.pack(side='left', anchor='e')
+        self.join_button = Button(frame, text="Join", width=10).pack(side='left')
+        frame.pack(side='top', anchor='nw')
+
+    def display_chat_entry_box(self):
+        frame = Frame()
+        Label(frame, text='Enter message:', font=("Serif", 12)).pack(side='top', anchor='w')
+        self.enter_text_widget = Text(frame, width=60, height=3, font=("Serif", 12))
+        self.enter_text_widget.pack(side='left', pady=15)
+        self.enter_text_widget.bind('<Return>', self.on_enter_key_pressed)
+        frame.pack(side='top')
+
+    def on_enter_key_pressed(self, event):
+        self.send_chat()
+        self.clear_text()
+
+    def clear_text(self):
+        self.enter_text_widget.delete(1.0, 'end')
+
+    def send_chat(self):
+        senders_name = self.name_widget.get().strip() + ": "
+        data = self.enter_text_widget.get(1.0, 'end').strip()
+        message = (senders_name + data).encode('utf-8')
+        self.chat_transcript_area.insert('end', message.decode('utf-8') + '\n')
+        self.chat_transcript_area.yview(END)
+        asyncio.run(sendCode(self.client, message))
+        self.enter_text_widget.delete(1.0, 'end')
+        return 'break'
+
+
+async def sendCode(client, message):
+    await client.room_send(
+        # Watch out! If you join an old room you'll see lots of old messages
+        room_id="!ACnkQQftfhtOzCGYWh:matrix.org",
+        message_type="m.room.message",
+        content={
+            "msgtype": "m.text",
+            "body": str(message)
+        }
+    )
+
+
+
+# the main function
 if __name__ == '__main__':
     root = Tk()
-    gui = GUI(root)
-    root.protocol("WM_DELETE_WINDOW", gui.on_close_window)
+    gui = MatrixGUI(root)
+    root.protocol("WM_DELETE_WINDOW")
     root.mainloop()
