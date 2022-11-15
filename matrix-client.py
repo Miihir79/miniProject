@@ -1,4 +1,5 @@
 import sys
+import subprocess
 from  tkinter import Tk, Frame, Scrollbar, Label, END, Entry, Text, VERTICAL, Button, messagebox
 import matrix_commander
 
@@ -23,11 +24,17 @@ def sendMsg(msg):
     workCheck()
 
 def receiveMsg():
-    sys.argv[0] = "matrix-commander"
-    sys.argv.extend(["--tail",])
+    cmd = ["matrix-commander", "--tail"]
+
+    result = subprocess.run(cmd, capture_output = True)
+
+    finalMsg = result.stdout
+    # sys.argv[0] = "matrix-commander"
+    # sys.argv.extend(["--tail"])
 
     workCheck()
 
+    return finalMsg.decode()
 
 class GUI:
     def __init__(self, master):
@@ -41,9 +48,9 @@ class GUI:
     def initialize_gui(self):  # GUI initializer
         self.root.title("Socket Chat")
         self.root.resizable(0, 0)
-        receiveMsg()
         self.display_chat_box()
         self.display_chat_entry_box()
+        self.recieve_chat()
 
     def display_chat_box(self):
         frame = Frame()
@@ -79,6 +86,18 @@ class GUI:
         sendMsg(message)
         self.enter_text_widget.delete(1.0, 'end')
         return 'break'
+
+    def startRec(self):
+        showThis = receiveMsg()
+        print(showThis,type(showThis))
+        self.chat_transcript_area.insert('end', showThis + '\n')
+        self.chat_transcript_area.yview(END)
+
+    def recieve_chat(self):
+        frame = Frame()
+        Button(frame, text = "Refresh", width = 10, command = self.startRec).pack(side = 'left')
+        frame.pack()
+
 
 
 if __name__ == '__main__':
