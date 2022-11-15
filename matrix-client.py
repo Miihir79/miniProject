@@ -24,13 +24,10 @@ def sendMsg(msg):
     workCheck()
 
 def receiveMsg():
-    cmd = ["matrix-commander", "--tail"]
-
+    cmd = ["matrix-commander", "--tail", "--listen-self"]
     result = subprocess.run(cmd, capture_output = True)
 
     finalMsg = result.stdout
-    # sys.argv[0] = "matrix-commander"
-    # sys.argv.extend(["--tail"])
 
     workCheck()
 
