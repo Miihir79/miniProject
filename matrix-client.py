@@ -1,8 +1,10 @@
 import sys
+import re
 import subprocess
 from  tkinter import Tk, Frame, Scrollbar, Label, END, Entry, Text, VERTICAL, Button, messagebox
 import matrix_commander
 
+# Method to check for errors in execution in matrix methods
 def workCheck() -> None:
     try: 
         ret = matrix_commander.main()
@@ -28,10 +30,29 @@ def receiveMsg():
     result = subprocess.run(cmd, capture_output = True)
 
     finalMsg = result.stdout
+    # Converting byte to str
+    finalMsg = finalMsg.decode()
+
+    recMsg = formatMsg(finalMsg)
 
     workCheck()
 
-    return finalMsg.decode()
+    return recMsg
+
+# Method to format the incoming string of recieved msgs
+def formatMsg(string):
+    msgList = re.split("\n", string)
+
+    dispTxt = []
+    for msg in msgList:
+        if msg != '':
+            splitMsg = re.split("\|", msg)
+            print(splitMsg)
+            finalTxt = splitMsg[1] + ':' + splitMsg[3]
+            dispTxt.append(finalTxt)
+
+    dispTxtStr = "\n".join(dispTxt)
+    return dispTxtStr
 
 class GUI:
     def __init__(self, master):
@@ -86,7 +107,7 @@ class GUI:
 
     def startRec(self):
         showThis = receiveMsg()
-        print(showThis,type(showThis))
+        # print(showThis,type(showThis))
         self.chat_transcript_area.insert('end', showThis + '\n')
         self.chat_transcript_area.yview(END)
 
