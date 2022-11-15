@@ -2,10 +2,7 @@ import sys
 from  tkinter import Tk, Frame, Scrollbar, Label, END, Entry, Text, VERTICAL, Button, messagebox
 import matrix_commander
 
-def sendMsg(msg):
-    sys.argv[0] = "matrix-commander"
-    sys.argv.extend(["--message", msg])
-
+def workCheck() -> None:
     try: 
         ret = matrix_commander.main()
 
@@ -19,6 +16,19 @@ def sendMsg(msg):
         print(f"Exception happened: {e}")
         ret = 99
 
+def sendMsg(msg):
+    sys.argv[0] = "matrix-commander"
+    sys.argv.extend(["--message", msg])
+
+    workCheck()
+
+def receiveMsg():
+    sys.argv[0] = "matrix-commander"
+    sys.argv.extend(["--tail",])
+
+    workCheck()
+
+
 class GUI:
     def __init__(self, master):
         self.root = master
@@ -31,6 +41,7 @@ class GUI:
     def initialize_gui(self):  # GUI initializer
         self.root.title("Socket Chat")
         self.root.resizable(0, 0)
+        receiveMsg()
         self.display_chat_box()
         self.display_chat_entry_box()
 
@@ -65,7 +76,6 @@ class GUI:
         message = data
         self.chat_transcript_area.insert('end', message + '\n')
         self.chat_transcript_area.yview(END)
-        # self.client_socket.send(message)
         sendMsg(message)
         self.enter_text_widget.delete(1.0, 'end')
         return 'break'
