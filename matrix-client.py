@@ -44,7 +44,8 @@ def formatMsg(string):
     msgList = re.split("\n", string)
 
     dispTxt = []
-    for msg in msgList:
+    # Reversing the traversal and further formatting
+    for msg in reversed(msgList):
         if msg != '':
             splitMsg = re.split("\|", msg)
             print(splitMsg)
@@ -54,7 +55,7 @@ def formatMsg(string):
     dispTxtStr = "\n".join(dispTxt)
     return dispTxtStr
 
-class GUI:
+class MatrixGUI:
     def __init__(self, master):
         self.root = master
         self.chat_transcript_area = None
@@ -64,8 +65,8 @@ class GUI:
         self.initialize_gui()
 
     def initialize_gui(self):  # GUI initializer
-        self.root.title("Socket Chat")
-        self.root.resizable(0, 0)
+        self.root.title("Matrix Chat")
+        self.root.resizable(1, 1)
         self.display_chat_box()
         self.display_chat_entry_box()
         self.recieve_chat()
@@ -116,10 +117,15 @@ class GUI:
         Button(frame, text = "Refresh", width = 10, command = self.startRec).pack(side = 'left')
         frame.pack()
 
+    def on_close_window(self):
+        if messagebox.askokcancel("Quit", "Do you want to quit?"):
+            self.root.destroy()
+            exit(0)    
+
 
 
 if __name__ == '__main__':
     root = Tk()
-    gui = GUI(root)
-    root.protocol("WM_DELETE_WINDOW")
+    gui = MatrixGUI(root)
+    root.protocol("WM_DELETE_WINDOW", gui.on_close_window)
     root.mainloop()
