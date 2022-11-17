@@ -1,5 +1,5 @@
 import asyncio
-from credentials import userID, userPWD
+# from credentials import userID, userPWD
 
 from nio import AsyncClient, MatrixRoom, RoomMessageText
 
@@ -12,10 +12,10 @@ async def message_callback(room: MatrixRoom, event: RoomMessageText) -> None:
 
 
 async def main() -> None:
-    client = AsyncClient("https://matrix.org", userID)
+    client = AsyncClient("https://matrix.org", "@mihirs:matrix.org")
     client.add_event_callback(message_callback, RoomMessageText)
 
-    print(await client.login(userPWD))
+    print(await client.login("QX6pJsNh.v.7GU!"))
     # "Logged in as @alice:example.org device id: RANDOMDID"
 
     # If you made a new room and haven't joined as that user, you can use
@@ -23,7 +23,7 @@ async def main() -> None:
 
     await client.room_send(
         # Watch out! If you join an old room you'll see lots of old messages
-        room_id="#matrix:matrix.org",
+        room_id="!ACnkQQftfhtOzCGYWh:matrix.org",
         message_type="m.room.message",
         content={
             "msgtype": "m.text", 
