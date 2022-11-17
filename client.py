@@ -3,6 +3,7 @@ import os
 import threading
 from tkinter import Tk, Frame, Scrollbar, Label, END, Entry, Text, VERTICAL, Button, messagebox
 
+
 class GUI:
     client_socket = None
     last_received_message = None
@@ -62,7 +63,7 @@ class GUI:
     def display_chat_box(self):
         frame = Frame()
         Label(frame, text='Chat Box:', font=("Serif", 12)).pack(side='top', anchor='w')
-        self.chat_transcript_area = Text(frame, width=60, height=10, font=("Serif", 12))
+        self.chat_transcript_area = Text(frame, width=120, height=30, font=("Serif", 12))
         scrollbar = Scrollbar(frame, command=self.chat_transcript_area.yview, orient=VERTICAL)
         self.chat_transcript_area.config(yscrollcommand=scrollbar.set)
         self.chat_transcript_area.bind('<KeyPress>', lambda e: 'break')
@@ -73,7 +74,7 @@ class GUI:
     def display_chat_entry_box(self):
         frame = Frame()
         Label(frame, text='Enter message:', font=("Serif", 12)).pack(side='top', anchor='w')
-        self.enter_text_widget = Text(frame, width=60, height=3, font=("Serif", 12))
+        self.enter_text_widget = Text(frame, width=120, height=3, font=("Serif", 12))
         self.enter_text_widget.pack(side='left', pady=15)
         self.enter_text_widget.bind('<Return>', self.on_enter_key_pressed)
         frame.pack(side='top')
@@ -87,7 +88,7 @@ class GUI:
 
     def send_chat(self):
         data = self.enter_text_widget.get(1.0, 'end').strip()
-        message = (data).encode('utf-8')
+        message = data.encode('utf-8')
         self.chat_transcript_area.insert('end', message.decode('utf-8') + '\n')
         self.chat_transcript_area.yview(END)
         self.client_socket.send(message)
@@ -102,12 +103,14 @@ class GUI:
 
     def matrix_button(self):
         frame = Frame()
-        Button(frame, text = "Matrix Chat", width = 10, command = matrixRun).pack(side = 'left')
+        Button(frame, text="Matrix Chat", width=10, command=matrixRun).pack(side='left')
         frame.pack()
+
 
 # Method to call the matrix-client window
 def matrixRun():
-    os.system("python3 matrix-client.py")
+    os.system("python matrix-client.py")
+
 
 # the main function
 if __name__ == '__main__':
